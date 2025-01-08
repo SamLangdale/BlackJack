@@ -1,0 +1,23 @@
+.container {
+    max-width: 100%;
+    max-height: 100%;
+    margin: 50px auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #0b6623;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.card {
+    display: inline-grid;
+    width: 60px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    img {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+}
