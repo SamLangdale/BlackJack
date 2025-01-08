@@ -124,6 +124,13 @@ function calculateScore() {
             playAgain();
             return;
         }
+        if(isStand && dealerScore === playerScore) {
+            isStand = false;
+            alert("Dealer wins!");
+            playAgain();
+            return;
+
+        }
     const playerScoreElement = document.getElementById("player-score").textContent = 'Score: ' + playerScore;
     const dealerScoreElement = document.getElementById("dealer-score").textContent = 'Score: ' + dealerScore;
 }
