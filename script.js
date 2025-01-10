@@ -60,8 +60,8 @@ function initialdeal() {
     // hidden card
     const hiddenCard = document.createElement("div");
     hiddenCard.classList.add("card");
-    hiddenCard.innerHTML = `<img src="images/cardback.png" alt="Hidden card">`;
-    hiddenCard.id = "hidden-dealer-card"; // Add an ID to make it easy to reveal later
+    hiddenCard.innerHTML = `<img src="images/cardback.png" alt="Hidden card">hole card`;
+    //hiddenCard.id = "hidden-dealer-card"; // Add an ID to make it easy to reveal later
     dealerCards.appendChild(hiddenCard);
 
     dealButton.disabled = true;
@@ -73,7 +73,6 @@ function calculateScore() {
     playerScore = 0;
     dealerScore = 0;
     let playerAces = 0;
-    let dealerAces = 0;
     for (let i = 0; i < player.length; i++) {
         if (player[i].value === "ace") {
             playerScore += 11;
@@ -89,7 +88,6 @@ function calculateScore() {
     for (let i = 0; i < dealer.length; i++) {
         if (dealer[i].value === "ace") {
             dealerScore += 11;
-            dealerAces++;
         } else if (dealer[i].value === "king" || dealer[i].value === "queen" || dealer[i].value === "jack") {
             dealerScore += 10;
         } else {
@@ -99,10 +97,6 @@ function calculateScore() {
             break;
         }
     }
-        while (dealerScore > 21 && dealerAces > 0) {
-                dealerScore -= 10;
-                dealerAces--;
-            }
     while (playerScore > 21 && playerAces > 0) {
         playerScore -= 10;
         playerAces--;
