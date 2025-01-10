@@ -9,6 +9,7 @@
 <div class="container">
     <h1>Blackjack Game</h1>
     <div id="status">Click "Deal" to start!</div>
+    <!--<div>dealer stands at 17</div> -->
     <div>
         <h2>You</h2>
         <div id="player-cards" class="cards"></div>
@@ -23,6 +24,13 @@
         <button id="deal-btn">Deal</button>
         <button id="hit-btn" disabled>Hit</button>
         <button id="stand-btn" disabled>Stand</button>
+        <button id="reset-btn">Reset</button>
+    </div>
+</div>
+<div id="result-popup" class="popup hidden">
+    <div class="popup-content">
+        <h2 id="popup-message"></h2>
+        <button id="close-popup">Close</button>
     </div>
 </div>
 <h1></h1>

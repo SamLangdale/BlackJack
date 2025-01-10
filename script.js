@@ -3,15 +3,19 @@ alert("Welcome to blackjack");
 const dealButton = document.getElementById("deal-btn");
 const hitButton = document.getElementById("hit-btn");
 const standButton = document.getElementById("stand-btn");
+const resetButton = document.getElementById("reset-btn");
 dealButton.addEventListener("click", () => {createDeck(); initialdeal(); isStand = false;})
 hitButton.addEventListener("click", () => {hit();})
 standButton.addEventListener("click", () => {stand();})
+resetButton.addEventListener("click", () => {reset();})
 const suites= ["hearts", "diamonds", "clubs", "spades"];
 const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
 let deck = [];
 let player = [];
 let dealer = [];
 let isStand = false;
+let playerScore = 0;
+let dealerScore = 0;
 
 function createDeck() {
     deck = [];
@@ -48,20 +52,26 @@ function initialdeal() {
     }
     const dealerCards = document.getElementById("dealer-cards");
     dealerCards.innerHTML = "";
-    for (let i = 0; i < dealer.length; i++) {
-        const card = document.createElement("div");
-        card.classList.add("card");
-        card.innerHTML = `<img src="images/${dealer[i].value}_of_${dealer[i].suit}.png" alt="${dealer[i].suit}">${dealer[i].value}`;
-        dealerCards.appendChild(card);
-    }
+    // first dealer card
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.innerHTML = `<img src="images/${dealer[0].value}_of_${dealer[0].suit}.png" alt="${dealer[0].suit}">${dealer[0].value}`;
+    dealerCards.appendChild(card);
+    // hidden card
+    const hiddenCard = document.createElement("div");
+    hiddenCard.classList.add("card");
+    hiddenCard.innerHTML = `<img src="images/cardback.png" alt="Hidden card">`;
+    hiddenCard.id = "hidden-dealer-card"; // Add an ID to make it easy to reveal later
+    dealerCards.appendChild(hiddenCard);
+
     dealButton.disabled = true;
     hitButton.disabled = false;
     standButton.disabled = false;
     calculateScore();
 }
 function calculateScore() {
-    let playerScore = 0;
-    let dealerScore = 0;
+    playerScore = 0;
+    dealerScore = 0;
     let playerAces = 0;
     let dealerAces = 0;
     for (let i = 0; i < player.length; i++) {
@@ -85,54 +95,22 @@ function calculateScore() {
         } else {
             dealerScore += parseInt(dealer[i].value);
         }
+        if(!isStand) {
+            break;
+        }
     }
         while (dealerScore > 21 && dealerAces > 0) {
                 dealerScore -= 10;
                 dealerAces--;
             }
-        if(dealerScore > 21) {
-            alert("Dealer busted, You win!");
-            playAgain();
-            isStand = false;
-            return;
-        }
-            while (playerScore > 21 && playerAces > 0) {
-                playerScore -= 10;
-                playerAces--;
-            }
-        if(playerScore > 21) {
-            alert("You busted, Dealer wins!");
-            playAgain();
-            isStand = false;
-            return;
-        }
-        if(playerScore === 21) {
-            alert("Blackjack! You win!");
-            playAgain();
-            isStand = false;
-            return;
-        }
-        if(dealerScore === 21) {
-            alert("Dealer has Blackjack! You lose!");
-            playAgain();
-            isStand = false;
-            return;
-        }
-        if(isStand && dealerScore > playerScore) {
-            isStand = false;
-            alert("Dealer wins!");
-            playAgain();
-            return;
-        }
-        if(isStand && dealerScore === playerScore) {
-            isStand = false;
-            alert("Dealer wins!");
-            playAgain();
-            return;
+    while (playerScore > 21 && playerAces > 0) {
+        playerScore -= 10;
+        playerAces--;
+    }
 
-        }
     const playerScoreElement = document.getElementById("player-score").textContent = 'Score: ' + playerScore;
     const dealerScoreElement = document.getElementById("dealer-score").textContent = 'Score: ' + dealerScore;
+    result();
 }
 function hit() {
     player.push(deck.pop());
@@ -145,6 +123,7 @@ function hit() {
         playerCards.appendChild(card);
     }
     calculateScore();
+    result();
 }
 
 function reset() {
@@ -164,26 +143,79 @@ function reset() {
 
 function stand() {
     isStand = true;
-    while (isStand) {
+    // reveals the cards of the dealer
+    const dealerCards = document.getElementById("dealer-cards");
+    dealerCards.innerHTML = "";
+    for (let i = 0; i < dealer.length; i++) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `<img src="images/${dealer[i].value}_of_${dealer[i].suit}.png" alt="${dealer[i].suit}">${dealer[i].value}`;
+        dealerCards.appendChild(card);
+    }
+    calculateScore();
+    result();
+    while (isStand) { // while the dealer is able to draw he will until return
         dealer.push(deck.pop());
         const dealerCards = document.getElementById("dealer-cards");
         dealerCards.innerHTML = "";
         for (let i = 0; i < dealer.length; i++) {
             const card = document.createElement("div");
             card.classList.add("card");
-            card.innerHTML = `<img src="images/${dealer[i].suit}.png" alt="${dealer[i].suit}">${dealer[i].value}`;
+            card.innerHTML = `<img src="images/${dealer[i].value}_of_${dealer[i].suit}.png" alt="${dealer[i].suit}">${dealer[i].value}`;
             dealerCards.appendChild(card);
         }
         calculateScore();
+        result();
     }
 }
-function playAgain() {
-    if (confirm("Do you want to play again?")) {
-        reset();
-        }
-        else {
-            alert("Thanks for playing!");
-            reset();
-        }
-
+function result() {
+    if (playerScore > 21) {
+        showPopup("You busted, Dealer wins!");
+        isStand = false;
+        return;
+    }
+    if (playerScore === 21) {
+        showPopup("Blackjack! You win!");
+        isStand = false;
+        return;
+    }
+    if (dealerScore === 21) {
+        showPopup("Dealer has Blackjack! You lose!");
+        isStand = false;
+        return;
+    }
+    if (isStand && dealerScore > playerScore && dealerScore < 22) {
+        isStand = false;
+        showPopup("Dealer wins!");
+        return;
+    }
+    if (isStand && dealerScore === playerScore) {
+        isStand = false;
+        showPopup("Dealer matched your score, Dealer wins!");
+        return;
+    }
+    if (isStand && dealerScore > 22) {
+        isStand = false;
+        showPopup("Dealer Busted, You Win!");
+        return;
+    }
 }
+
+    function showPopup(message) {
+        const popup = document.getElementById("result-popup");
+        const popupMessage = document.getElementById("popup-message");
+        const closePopupButton = document.getElementById("close-popup");
+
+        // Set message and show the popup
+        popupMessage.textContent = message;
+        popup.classList.remove("hidden");
+
+        // Close the popup when the button is clicked
+        closePopupButton.addEventListener("click", () => {
+            popup.classList.add("hidden");
+        });
+    }
+
+
+
+
