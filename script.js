@@ -4,7 +4,7 @@ const dealButton = document.getElementById("deal-btn");
 const hitButton = document.getElementById("hit-btn");
 const standButton = document.getElementById("stand-btn");
 const resetButton = document.getElementById("reset-btn");
-dealButton.addEventListener("click", () => {createDeck(); initialdeal(); isStand = false;})
+dealButton.addEventListener("click", () => {createDeck(); initialdeal(); isStand = false; })
 hitButton.addEventListener("click", () => {hit();})
 standButton.addEventListener("click", () => {stand();})
 resetButton.addEventListener("click", () => {reset();})
@@ -68,6 +68,17 @@ function initialdeal() {
     hitButton.disabled = false;
     standButton.disabled = false;
     calculateScore();
+    if (playerScore === 21) {
+        showPopup("Blackjack! You win!");
+        dealButton.disabled = true;
+        hitButton.disabled = true;
+        standButton.disabled = true;
+        isStand = false;
+        return;
+    }
+    if(dealer[0].value === "ace") {
+        dealerReveal() // if the dealer has an ace, then you reveal the hidden card to check for black jack
+    }
 }
 function calculateScore() {
     playerScore = 0;
@@ -104,7 +115,6 @@ function calculateScore() {
 
     const playerScoreElement = document.getElementById("player-score").textContent = 'Score: ' + playerScore;
     const dealerScoreElement = document.getElementById("dealer-score").textContent = 'Score: ' + dealerScore;
-    result();
 }
 function hit() {
     player.push(deck.pop());
@@ -165,32 +175,34 @@ function stand() {
 function result() {
     if (playerScore > 21) {
         showPopup("You busted, Dealer wins!");
-        isStand = false;
-        return;
-    }
-    if (playerScore === 21) {
-        showPopup("Blackjack! You win!");
-        isStand = false;
-        return;
-    }
-    if (dealerScore === 21) {
-        showPopup("Dealer has Blackjack! You lose!");
+        dealButton.disabled = true;
+        hitButton.disabled = true;
+        standButton.disabled = true;
         isStand = false;
         return;
     }
     if (isStand && dealerScore > playerScore && dealerScore < 22) {
         isStand = false;
         showPopup("Dealer wins!");
+        dealButton.disabled = true;
+        hitButton.disabled = true;
+        standButton.disabled = true;
         return;
     }
     if (isStand && dealerScore === playerScore) {
         isStand = false;
         showPopup("Dealer matched your score, Dealer wins!");
+        dealButton.disabled = true;
+        hitButton.disabled = true;
+        standButton.disabled = true;
         return;
     }
     if (isStand && dealerScore > 22) {
         isStand = false;
         showPopup("Dealer Busted, You Win!");
+        dealButton.disabled = true;
+        hitButton.disabled = true;
+        standButton.disabled = true;
         return;
     }
 }
@@ -208,6 +220,30 @@ function result() {
         closePopupButton.addEventListener("click", () => {
             popup.classList.add("hidden");
         });
+    }
+    function dealerReveal() {
+        const dealerCards = document.getElementById("dealer-cards");
+        dealerCards.innerHTML = "";
+        for (let i = 0; i < dealer.length; i++) {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerHTML = `<img src="images/${dealer[i].value}_of_${dealer[i].suit}.png" alt="${dealer[i].suit}">${dealer[i].value}`;
+            dealerCards.appendChild(card);
+        }
+        isStand = true; // reusing stand variable for simplicity
+        calculateScore()
+        isStand = false;
+        if(dealerScore === 21) {
+            isStand = false;
+            showPopup("Dealer has Black jack, You lose!");
+            dealButton.disabled = true;
+            hitButton.disabled = true;
+            standButton.disabled = true;
+            return;
+
+        }
+        isStand = false;
+
     }
 
 
